@@ -1,10 +1,11 @@
 import os
-from dotenv import dotenv_values
 import discord
+from dotenv import load_dotenv
+load_dotenv()
 
-env = dotenv_values(".env")
+TOKEN = os.getenv("TOKEN")
 
-TOKEN = env.get("TOKEN")
+print("CONFIG TOKEN:", TOKEN)
 
 PREFIX = "!"
 
