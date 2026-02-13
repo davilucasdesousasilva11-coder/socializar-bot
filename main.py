@@ -9,6 +9,9 @@ import random
 
 import config
 
+humor = "neutro"
+interacoes = 0
+
 bot = commands.Bot(
 
     command_prefix=config.PREFIX, intents=config.INTENTS
@@ -53,7 +56,26 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if random.random() < 0.12:
+    if message.author.bot:
+        return
+    
+    global humor, interacoes
+
+    interacoes += 1
+
+    if interacoes > 40:
+        humor = "animado"
+    elif interacoes > 80:
+        humor = "cansado"
+    
+    chance = 0.12
+
+    if humor == "animado":
+        chance = 0.18
+    elif humor == "cansado":
+        chance = 0.05
+
+    if random.random() < chance:
         emoji_id = random.choice(EMOJIS_IDS)
         emoji = bot.get_emoji(emoji_id)
 
@@ -112,7 +134,6 @@ async def on_message(message):
                 )
 
                 return
-
 
         await bot.process_commands(message)
 
