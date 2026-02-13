@@ -57,7 +57,7 @@ async def on_message(message):
         if message.author.id == config.OWNER_ID:
             await message.channel.send(f"{message.author.mention} Você, senhorita Kio. 👑")
         else:
-            await message.channel.send(f'{message.author.mention}Minha criadora se chama "Kioyichi". 👑')
+            await message.channel.send(f'{message.author.mention} Minha criadora se chama "Kioyichi". 👑')
             return
 
     if message.content.strip()in (
