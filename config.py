@@ -5,9 +5,9 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
 
-print("CONFIG TOKEN:", TOKEN)
+OWNER_ID = 1330568796511014922
 
-PREFIX = "!"
+PREFIX = "$"
 
 INTENTS = discord.Intents.default()
 INTENTS.message_content = True

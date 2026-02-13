@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import os
 import asyncio
 import sqlite3
@@ -44,6 +44,18 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
+    
+    conteudo = message.content.lower()
+
+    if (
+        "quem" in conteudo and "criadora" in conteudo
+        and "socializar" in conteudo
+    ):
+        if message.author.id == config.OWNER_ID:
+            await message.channel.send("Você, senhorita Kio. 👑")
+        else:
+            await message.channel.send('Minha criadora se chama "Kioyichi". 👑')
+            return
 
     if message.content.strip()in (
 
