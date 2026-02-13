@@ -14,6 +14,8 @@ bot = commands.Bot(
     command_prefix=config.PREFIX, intents=config.INTENTS
 )
 
+ultimo_usuario_que_mencionou = None
+
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -79,6 +81,18 @@ async def on_message(message):
             f"Ainda estou em desenvolvimento 🚧\n"
             f"Em breve terei comandos e funcionalidades novas!"
         )
+
+        global ultimo_usuario_que_mencionou
+
+        if bot.user in message.mentions:
+
+            if ultimo_usuario_que_mencionou == message.author.id:
+                await message.channel.send(f"Já estou aqui, {message.author.mention}! 😄")
+            else:
+                await message.channel.send(f"Oi, {message.author.mention}! Precisa de algo? 😊")
+
+                ultimo_usuario_que_mencionou = message.author.id
+
         await bot.process_commands(message)
 
 
