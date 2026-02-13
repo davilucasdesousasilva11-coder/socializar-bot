@@ -92,6 +92,7 @@ async def on_message(message):
                 await message.channel.send(f"Oi, {message.author.mention}! Precisa de algo? 😊")
 
                 ultimo_usuario_que_mencionou = message.author.id
+                return
 
         await bot.process_commands(message)
 
