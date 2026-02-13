@@ -50,7 +50,7 @@ async def on_ready():
     await bot.change_presence(
         activity=discord.Activity(
             type=discord.ActivityType.listening, 
-            name="Sons da minha guitarra. 🎸"
+            name="Reclamações da patroa. 🍔"
         )
     )
 
