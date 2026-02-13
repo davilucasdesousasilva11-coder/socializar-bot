@@ -4,6 +4,7 @@ import os
 import asyncio
 import sqlite3
 from datetime import datetime
+import traceback
 
 import config
 
@@ -33,11 +34,29 @@ async def on_ready():
         print(e)
 
     await bot.change_presence(
-        atividade=discord.Activity(
+        activity=discord.Activity(
             type=discord.ActivityType.listening, 
             name="Sons da minha guitarra. 🎸"
         )
     )
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return
+
+    if message.content.strip()in (
+
+        f"<@{bot.user.id}>",
+        f"<@!{bot.user.id}"
+    ):
+        await message.channel.send(
+            f"👋 Oi! Eu sou **{bot.user.name}**\n"
+            f"Ainda estou em desenvolvimento 🚧\n"
+            f"Em breve terei comandos e funcionalidades novas!"
+        )
+        await bot.process_commands(message)
+
 
 async def load_cogs():
     for filename in os.listdir("./cogs"):
@@ -45,11 +64,13 @@ async def load_cogs():
             await bot.load_extension(f"cogs.{filename[:-3]}")
 
 async def main():
-    async with bot:
-        await load_cogs()
-        print("Iniciando bot...")
-        await bot.start(config.TOKEN)
+    print("Iniciando bot...")
 
 asyncio.run(main())
+
+if __name__ == "__main__":
+    TOKEN = os.environ["TOKEN"]
+
+bot.run(TOKEN)
 
     
