@@ -6,6 +6,7 @@ import sqlite3
 from datetime import datetime
 import traceback
 import random
+import unicodedata
 
 import config
 
@@ -95,7 +96,7 @@ async def on_message(message):
                 async with message.channel.typing():
                     await asyncio.sleep(1.5)
 
-                    
+
                 if message.author.id == config.OWNER_ID:
 
                     await message.reply(
@@ -106,6 +107,18 @@ async def on_message(message):
                         "Bom dia, qual vai ser o hambúrguer de hoje?"
                     )
                     return
+                
+    if message.author.id == config.AMIGO_ID and bot.user in message.mentions:
+
+        conteudo = message.content.lower()
+        conteudo = remover_acentos(conteudo)
+
+        if "e o salario " in conteudo:
+            async with message.channel.typing():
+                await asyncio.sleep(2)
+            await message.reply("O salário tá atrasado. A patroa disse que é 'experiência remunerada'. 💵"
+                                )
+            return
 
 
     conteudo = message.content.lower()
@@ -159,6 +172,12 @@ async def on_message(message):
                 return
 
         await bot.process_commands(message)
+
+def remover_acentos(texto):
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', texto)
+        if unicodedata.category(c) != 'Mn'
+    )
 
 
 async def load_cogs():
