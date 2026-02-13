@@ -53,7 +53,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if random.random() < 0.08:
+    if random.random() < 0.12:
         emoji_id = random.choice(EMOJIS_IDS)
         emoji = bot.get_emoji(emoji_id)
 
