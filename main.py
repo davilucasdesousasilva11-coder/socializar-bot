@@ -92,7 +92,10 @@ async def on_message(message):
             primeira_palavra = conteudo[0]
             
             if primeira_palavra == "oi":
+                async with message.channel.typing():
+                    await asyncio.sleep(1.5)
 
+                    
                 if message.author.id == config.OWNER_ID:
 
                     await message.reply(
