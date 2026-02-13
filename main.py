@@ -82,17 +82,28 @@ async def on_message(message):
             f"Em breve terei comandos e funcionalidades novas!"
         )
 
-        global ultimo_usuario_que_mencionou
+    if bot.user in message.mentions:
 
-        if bot.user in message.mentions:
+        if message.reference:
+            try:
+                msg_referenciada = await message.channel.fetch_message(
 
-            if ultimo_usuario_que_mencionou == message.author.id:
-                await message.channel.send(f"Já estou aqui, {message.author.mention}! 😄")
-            else:
-                await message.channel.send(f"Oi, {message.author.mention}! Precisa de algo? 😊")
+                    message.redference.message_id
+                )
+                if msg_referenciada.author.id == bot.user.id:
+                    return
+            except:
+                pass
 
-                ultimo_usuario_que_mencionou = message.author.id
+            async with message.channel.typing():
+                await asyncio.sleep(1)
+                await message.channel.send(
+                    f"Oi {message.author.mention}! 👋\nSe precisar de ajuda, é só falar comigo ou com a Kio!"
+
+                )
+
                 return
+
 
         await bot.process_commands(message)
 
