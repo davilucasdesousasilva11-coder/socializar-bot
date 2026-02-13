@@ -66,10 +66,10 @@ async def load_cogs():
 async def main():
     print("Iniciando bot...")
 
-asyncio.run(main())
-
 if __name__ == "__main__":
     TOKEN = os.environ["TOKEN"]
+
+asyncio.run(main())
 
 bot.run(TOKEN)
 
