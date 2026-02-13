@@ -108,17 +108,19 @@ async def on_message(message):
                     )
                     return
                 
-    if message.author.id == config.AMIGO_ID and bot.user in message.mentions:
-
+    if message.author.bot:
+        return
+    
+    if message.author.id == config.YUME_ID and bot.user in message.mentions:
         conteudo = message.content.lower()
         conteudo = remover_acentos(conteudo)
 
-        if "e o salario " in conteudo:
+        if "e o salario" in conteudo:
             async with message.channel.typing():
                 await asyncio.sleep(2)
-            await message.reply("O salário tá atrasado. A patroa disse que é 'experiência remunerada'. 💵"
-                                )
-            return
+                await message.reply(
+                    "O salário tá atrasado, Yume. 😔"
+                )
 
 
     conteudo = message.content.lower()
