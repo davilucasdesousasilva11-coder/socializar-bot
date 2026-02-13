@@ -51,7 +51,7 @@ async def on_message(message):
         f"<@!{bot.user.id}"
     ):
         await message.channel.send(
-            f"👋 Oi! Eu sou **{bot.user.name}**\n"
+            f"👋 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"Ainda estou em desenvolvimento 🚧\n"
             f"Em breve terei comandos e funcionalidades novas!"
         )
