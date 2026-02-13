@@ -51,10 +51,13 @@ async def on_message(message):
         "quem" in conteudo and "criadora" in conteudo
         and "socializar" in conteudo
     ):
+        async with message.channel.typing():
+            await asyncio.sleep(1.5)
+
         if message.author.id == config.OWNER_ID:
-            await message.channel.send("Você, senhorita Kio. 👑")
+            await message.channel.send(f"{message.author.mention} Você, senhorita Kio. 👑")
         else:
-            await message.channel.send('Minha criadora se chama "Kioyichi". 👑')
+            await message.channel.send(f'{message.author.mention}Minha criadora se chama "Kioyichi". 👑')
             return
 
     if message.content.strip()in (
@@ -62,6 +65,8 @@ async def on_message(message):
         f"<@{bot.user.id}>",
         f"<@!{bot.user.id}"
     ):
+        async with message.channel.typing():
+            await asyncio.sleep(1)
         await message.channel.send(
             f"👋 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"Ainda estou em desenvolvimento 🚧\n"
