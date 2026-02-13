@@ -85,6 +85,26 @@ async def on_message(message):
             except:
                 pass
     
+    if bot.user in message.mentions:
+        conteudo = message.content.lower().split()
+
+        if len(conteudo) >= 2:
+            primeira_palavra = conteudo[0]
+            
+            if primeira_palavra == "oi":
+
+                if message.author.id == config.OWNER_ID:
+
+                    await message.reply(
+                        "B-bom dia, chefia. Eu não tô dormindo no serviço não :3"
+                    )
+                else:
+                    await message.reply(
+                        "Bom dia, qual vai ser o hambúrguer de hoje?"
+                    )
+                    return
+
+
     conteudo = message.content.lower()
 
     if (
