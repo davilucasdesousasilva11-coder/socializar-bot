@@ -16,6 +16,14 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
+EMOJIS_IDS = [
+    1471976695832641751,
+    1471976730250969302,
+    1471976677348343880,
+    1471976746076213378,
+    1471976711418679513
+]
+
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -45,14 +53,15 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.bot:
-        return
-    
-    if len(message.content) > 5 and random.random() < 0.08:
-        try:
-            await message.add_reaction("🎸")
-        except:
-            pass
+    if random.random() < 0.08:
+        emoji_id = random.choice(EMOJIS_IDS)
+        emoji = bot.get_emoji(emoji_id)
+
+        if emoji:
+            try:
+                await message.add_reaction(emoji)
+            except:
+                pass
     
     conteudo = message.content.lower()
 
@@ -88,7 +97,7 @@ async def on_message(message):
             try:
                 msg_referenciada = await message.channel.fetch_message(
 
-                    message.redference.message_id
+                    message.reference.message_id
                 )
                 if msg_referenciada.author.id == bot.user.id:
                     return
