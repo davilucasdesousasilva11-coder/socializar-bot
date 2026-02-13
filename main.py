@@ -1,10 +1,11 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 import os
 import asyncio
 import sqlite3
 from datetime import datetime
 import traceback
+import random
 
 import config
 
@@ -44,6 +45,12 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
+    
+    if len(message.content) > 5 and random.random() < 0.08:
+        try:
+            await message.add_reaction("🎸")
+        except:
+            pass
     
     conteudo = message.content.lower()
 
