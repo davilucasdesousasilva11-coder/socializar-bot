@@ -31,13 +31,25 @@ HUMORES = [
     "triste"
 ]
 
-EMOJIS_IDS = [
-    1471976695832641751,
-    1471976730250969302,
-    1471976677348343880,
-    1471976746076213378,
-    1471976711418679513
+REACOES = [
+    1472308381275652168,
+    1472308291097989222,
+    1472308307552112811,
+    1472308271862780228,
+    1472308208940089505,
+    1472308143538049026,
+    1472308363323904163,
+    1472308342058910060,
+    1472308323238936636
 ]
+
+CHANCES = {
+    "motivado": 0.50,
+    "neutro": 0.35,
+    "cansado": 0.20,
+    "revoltado": 0.15,
+    "triste": 0.10
+}
 
 @bot.event
 async def on_ready():
@@ -96,7 +108,16 @@ async def on_message(message):
 
             await bot.process_commands(message)
 
+    humor = humor_do_dia()
+    chance = CHANCES.get(humor, 0.30)
 
+    if random.random() < chance:
+
+        try:
+            emoji = random.choice(REACOES)
+            await message.add_reaction(emoji)
+        except:
+            pass
 
                 
     if message.author.bot:
