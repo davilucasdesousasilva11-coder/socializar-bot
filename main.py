@@ -31,18 +31,6 @@ HUMORES = [
     "triste"
 ]
 
-REACOES = [
-    1472308381275652168,
-    1472308291097989222,
-    1472308307552112811,
-    1472308271862780228,
-    1472308208940089505,
-    1472308143538049026,
-    1472308363323904163,
-    1472308342058910060,
-    1472308323238936636
-]
-
 CHANCES = {
     "motivado": 0.50,
     "neutro": 0.35,
@@ -109,16 +97,17 @@ async def on_message(message):
             await bot.process_commands(message)
 
     humor = humor_do_dia()
-    chance = CHANCES.get(humor, 0.30)
+    chance = CHANCES.get(humor, 0.25)
 
     if (
-        len(message.content) > 4 and not message.content.startswith(config.PREFIX) and random.random() < chance
-        ):
-
+        len(message.content) > 4 and not message.content.startswith(config.PREFIX)
+        and random.random() < chance
+    ):
+        
         try:
-            nomes_emojis = ["Bocchi_Cruz", "Bocchi_Cry", "Bocchi_Medu", "Bocchi_Noooo", "Bocchi_Overload", "Bocchi_Que", "Bocchi_Wah", "Bocchi_Yay", "Ryo_Dedo"]
-            
             emojis_disponiveis = []
+
+            nomes_emojis = ["Bocchi_Cruz", "Bocchi_Cry", "Bocchi_Medu", "Bocchi_Overload", "Bocchi_Noooo", "Bocchi_Que", "Bocchi_Wah", "Bocchi_Yay", "Ryo_Dedo"]
 
             for nome in nomes_emojis:
                 emoji = discord.utils.get(message.guild.emojis, name=nome)
@@ -126,13 +115,15 @@ async def on_message(message):
 
                     emojis_disponiveis.append(emoji)
 
-                    if emojis_disponiveis:
+                    if not emojis_disponiveis:
+                        emojis_disponiveis = ["🎸", "💸", "🍔"]
+
                         emoji_escolhido = random.choice(emojis_disponiveis)
 
                         await message.add_reaction(emoji_escolhido)
 
-        except Exception as e:
-            print("Erro ao reagir:", e)
+        except:
+            pass
 
                 
     if message.author.bot:
