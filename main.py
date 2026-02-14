@@ -3,7 +3,7 @@ from discord.ext import commands
 import os
 import asyncio
 import sqlite3
-from datetime import datetime
+from datetime import datetime, date
 import traceback
 import random
 import unicodedata
@@ -20,6 +20,14 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
+HUMORES = [
+    "motivado",
+    "neutro",
+    "cansado",
+    "revoltado",
+    "triste"
+]
+
 EMOJIS_IDS = [
     1471976695832641751,
     1471976730250969302,
@@ -32,6 +40,7 @@ EMOJIS_IDS = [
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
+    humor = humor_do_dia()
 
     database.setup()
     
@@ -40,6 +49,7 @@ async def on_ready():
     print(f"🆔 ID: {bot.user.id}")
     print(f"🌐 Servidores: {len(bot.guilds)}")
     print("🚀 Sistema inicializado com sucesso.")
+    print(f"🎭 Humor do dia: {humor}")
     print("=" * 40)
 
     try:
@@ -69,12 +79,12 @@ async def on_message(message):
     elif interacoes > 80:
         humor = "cansado"
     
-    chance = 0.12
+    chance = 0.
 
     if humor == "animado":
-        chance = 0.18
+        chance = 0.
     elif humor == "cansado":
-        chance = 0.05
+        chance = 0.
 
     if random.random() < chance:
         emoji_id = random.choice(EMOJIS_IDS)
@@ -96,17 +106,42 @@ async def on_message(message):
                 async with message.channel.typing():
                     await asyncio.sleep(1.5)
 
+                    if message.author.id == config.OWNER_ID:
+                        if humor == "motivado":
+                            resposta = f"Oi, patroa maravilhosa! Já tô fazendo acima da meta :3"
 
-                if message.author.id == config.OWNER_ID:
+                        elif humor == "neutro":
+                            resposta = f"Oi, patroa. O que manda?"
 
-                    await message.reply(
-                        "B-bom dia, chefia. Eu não tô dormindo no serviço não :3"
-                    )
-                else:
-                    await message.reply(
-                        "Bom dia, qual vai ser o hambúrguer de hoje?"
-                    )
-                    return
+                        elif humor == "cansado":
+                            resposta = f"Bom dia chefe... Você bem que poderia me dar uma folguinha, né? 😴"
+                        
+                        elif humor == "revoltado":
+                            resposta = f"Oi, chefia... Inclusive, sobre o meu salário..."
+                        
+                        elif humor == "triste":
+                            resposta = f"Bom dia, patroa... Espero que seu dia esteja bom, porque o meu já começou meio ruim... 😔"
+
+                        else:
+                    
+                            if humor == "motivado":
+                                resposta = "BOM DIA! Já tô pronto pro expediente! ☀️"
+                    
+                            elif humor == "neutro":
+                                resposta = "Bom dia. O expediente já começou, qual o lanche de hoje?"
+
+                            elif humor == "cansado":
+                                resposta = "Bom dia... já? Ainda tô com sono... 😴"
+                    
+                            elif humor == "revoltado":
+                                resposta = "Bom dia só se for pra você, porque o dia tá uma droga. 😡"
+                            elif humor == "triste":
+                                resposta = "Bom dia... se é que dá pra chamar isso de dia... 😔"
+
+                        await message.reply(resposta)
+                        return
+
+
                 
     if message.author.bot:
         return
@@ -180,6 +215,12 @@ def remover_acentos(texto):
         c for c in unicodedata.normalize('NFD', texto)
         if unicodedata.category(c) != 'Mn'
     )
+
+def humor_do_dia():
+    hoje = date.today()
+
+    random.seed(hoje.toordinal())
+    return random.choice(HUMORES)
 
 
 async def load_cogs():
