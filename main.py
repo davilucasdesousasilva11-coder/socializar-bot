@@ -111,13 +111,28 @@ async def on_message(message):
     humor = humor_do_dia()
     chance = CHANCES.get(humor, 0.30)
 
-    if random.random() < chance:
+    if (
+        len(message.content) > 4 and not message.content.startswith(config.PREFIX) and random.random() < chance
+        ):
 
         try:
-            emoji = random.choice(REACOES)
-            await message.add_reaction(emoji)
-        except:
-            pass
+            nomes_emojis = ["Bocchi_Cruz", "Bocchi_Cry", "Bocchi_Medu", "Bocchi_Noooo", "Bocchi_Overload", "Bocchi_Que", "Bocchi_Wah", "Bocchi_Yay", "Ryo_Dedo"]
+            
+            emojis_disponiveis = []
+
+            for nome in nomes_emojis:
+                emoji = discord.utils.get(message.guild.emojis, name=nome)
+                if emoji:
+
+                    emojis_disponiveis.append(emoji)
+
+                    if emojis_disponiveis:
+                        emoji_escolhido = random.choice(emojis_disponiveis)
+
+                        await message.add_reaction(emoji_escolhido)
+
+        except Exception as e:
+            print("Erro ao reagir:", e)
 
                 
     if message.author.bot:
