@@ -74,45 +74,27 @@ async def on_message(message):
         return
 
     conteudo = message.content.lower().strip()
-    humor = humor_do_dia()
 
+    if conteudo.startswith("oi") and bot.user in message.mentions:
+            
+            async with message.channel.typing():
+                await asyncio.sleep(1)
 
-    if (
-
-        conteudo.startswith("oi")
-        and bot.user in message.mentions
-    ):
-        async with message.channel.typing():
-            await asyncio.sleep(1.5)
-
-            if (
-
-                message.content.lower().startswith("oi")
-                and bot.user in message.mentions
-            ):
-                
                 if message.author.id == config.OWNER_ID:
-                    
-                    async with message.channel.typing():
-                        await asyncio.sleep(1)
+                    await message.channel.send(
 
-                        resposta = f"Bom dia, chefia. Hoje estou {humor_do_dia()}."
-                        await message.channel.send(resposta)
-                        return
+                        f"{message.author.mention} B-bom dia, senhorita Kio! Eu não tava dormindo no serviço não, juro :3"
+                    )
+                    return
 
-            else:
+                else:
+                    await message.channel.send(
 
-                respostas_cliente = {
-                    "motivado": "Bom dia, cliente! Qual o pedido de hoje? 😄",
-                    "neutro": "Bom dia, cliente. Faz o pedido aí.",
-                    "cansado": "Bom dia, cliente. Rápido, pra eu ir pra casa...",
-                    "revoltado": "Bom dia, tamo sob protesto, então faz rápido.",
-                    "triste": "Uh, bom dia, eu acho..."
-                }
-                resposta = respostas_cliente.get(humor, "Bom dia! Qual o pedido de hoje?")
+                        f"{message.author.mention} Bom dia! Em que posso te ajudar hoje? :3"
+                    )
+                    return
 
-                await message.reply(resposta)
-                return
+            await bot.process_commands(message)
 
 
 
