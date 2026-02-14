@@ -99,6 +99,7 @@ async def on_message(message):
 
                 if resposta is None:
                     resposta = "Bom dia, senhora Kio! Como posso ajudar hoje?"
+                    return
 
             else:
 
