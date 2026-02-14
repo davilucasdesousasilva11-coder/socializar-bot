@@ -85,12 +85,20 @@ async def on_message(message):
         async with message.channel.typing():
             await asyncio.sleep(1.5)
 
-            if message.author.id == config.OWNER_ID:
-                try:
-                    await message.reply("Teste exclusivo para a Kio! 😘")
-                except Exception as e:
-                    print("ERRO AO RESPONDER CHEFIA:", e)
-                    return
+            if (
+
+                message.content.lower().startswith("oi")
+                and bot.user in message.mentions
+            ):
+                
+                if message.author.id == config.OWNER_ID:
+                    
+                    async with message.channel.typing():
+                        await asyncio.sleep(1)
+
+                        resposta = f"Bom dia, chefia. Hoje estou {humor_do_dia()}."
+                        await message.channel.send(resposta)
+                        return
 
             else:
 
