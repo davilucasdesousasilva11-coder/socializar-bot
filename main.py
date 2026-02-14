@@ -86,19 +86,10 @@ async def on_message(message):
             await asyncio.sleep(1.5)
 
             if message.author.id == config.OWNER_ID:
-                respostas_kio = {
-
-                    "motivado": "Bom dia, senhora Kio! Já tô acima da meta!",
-                    "neutro": "Bom dia, senhora Kio.",
-                    "cansado": "Bom dia, senhora Kio. Já tô cansado, mas vamos lá...",
-                    "revoltado": "Bom dia, senhora Kio. Sobre o salário...",
-                "triste": "Bom dia, chefia..."
-                }
-
-                resposta = respostas_kio.get(humor)
-
-                if resposta is None:
-                    resposta = "Bom dia, senhora Kio! Como posso ajudar hoje?"
+                try:
+                    await message.reply("Teste exclusivo para a Kio! 😘")
+                except Exception as e:
+                    print("ERRO AO RESPONDER CHEFIA:", e)
                     return
 
             else:
