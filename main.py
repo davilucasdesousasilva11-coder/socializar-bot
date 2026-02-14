@@ -72,43 +72,44 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
-    
+
     conteudo = message.content.lower().strip()
     humor = humor_do_dia()
 
 
-    if bot.user in message.mentions and conteudo.startswith("oi"):
+    if (
 
+        conteudo.startswith("oi")
+        and bot.user in message.mentions
+    ):
         async with message.channel.typing():
             await asyncio.sleep(1.5)
 
             if message.author.id == config.OWNER_ID:
 
-                respostas_chefe = {
-                    "motivado": "B-bom dia, chefia! Já tô acima da meta :3",
-                    "neutro": "Oi, chefia. Tudo certo nesse setor.",
-                    "cansado": "Bom dia, chefia... Posso bater o ponto depois? 😔",
-                    "revoltado": "Ah, bom dia, chefia... Sobre aquele meu salário...",
-                    "triste": "Bom dia, chefia... Se é que tá bom dia, né... 😢"
+                respostas_chefia = {
+
+                    "motivado": "Oi, senhorita Kio! Tô acima da meta hoje :3",
+                    "neutro": "Bom dia, Kio. Tudo certo por enquanto.",
+                    "cansado": "Bom dia, Kio... Eu não tô dormindo em serviço :3",
+                    "revoltado": "Bom dia, patroa. Sobre o meu salário...",
+                    "triste": "Bom dia, chefia. Tá tudo bem, só um pouco desanimado hoje..."
                 }
+                resposta = respostas_chefia.get(humor, "Oi, senhorita Kio! Tudo certo por aqui.")
 
-                resposta = respostas_chefe.get(humor)
+            else:
 
-    else:
-    
-        respostas_cliente = {
-        "motivado": "Bom dia! Qual vai ser o pedido de hoje? 😄",
-        "neutro": "Olá. Faz o pedido aí.",
-        "cansado": "Bom dia... Escolhe rápido pra eu ir pra casa...",
-        "revoltado": "Bom dia. Estamos sob protesto.",
-        "triste": "Bom dia... o que cê quer?"
-    }
-    resposta = respostas_cliente.get(humor)
+                respostas_cliente = {
+                    "motivado": "Bom dia, cliente! Qual o pedido de hoje? 😄",
+                    "neutro": "Bom dia, cliente. Faz o pedido aí.",
+                    "cansado": "Bom dia, cliente. Rápido, pra eu ir pra casa...",
+                    "revoltado": "Bom dia, tamo sob protesto, então faz rápido.",
+                    "triste": "Uh, bom dia, eu acho..."
+                }
+                resposta = respostas_cliente.get(humor, "Bom dia! Qual o pedido de hoje?")
 
-    await message.reply(resposta)
-    return
-
-    await bot.process_commands(message) 
+                await message.reply(resposta)
+                return
 
 
 
