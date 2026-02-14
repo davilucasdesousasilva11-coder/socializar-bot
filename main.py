@@ -10,8 +10,11 @@ import unicodedata
 
 import config
 
-humor = "neutro"
-interacoes = 0
+def humor_do_dia():
+    hoje = date.today()
+
+    random.seed(hoje.toordinal())
+    return random.choice(HUMORES)
 
 bot = commands.Bot(
 
@@ -70,53 +73,43 @@ async def on_message(message):
     if message.author.bot:
         return
     
-    if message.author.bot:
-        return
-
     conteudo = message.content.lower().strip()
-    palavras = conteudo.split()
     humor = humor_do_dia()
 
-    if palavras and palavras[0] == "oi" and bot.user in message.mentions:
-                    async with message.channel.typing():
-                        await asyncio.sleep(1.5)
 
-                    if message.author.id == config.OWNER_ID:
-                        if humor == "motivado":
-                            resposta = f"Oi, patroa maravilhosa! Já tô fazendo acima da meta :3"
+    if bot.user in message.mentions and conteudo.startswith("oi"):
 
-                        elif humor == "neutro":
-                            resposta = f"Oi, patroa. O que manda?"
+        async with message.channel.typing():
+            await asyncio.sleep(1.5)
 
-                        elif humor == "cansado":
-                            resposta = f"Bom dia chefe... Você bem que poderia me dar uma folguinha, né? 😴"
-                        
-                        elif humor == "revoltado":
-                            resposta = f"Oi, chefia... Inclusive, sobre o meu salário..."
-                        
-                        elif humor == "triste":
-                            resposta = f"Bom dia, patroa... Espero que seu dia esteja bom, porque o meu já começou meio ruim... 😔"
+            if message.author.id == config.OWNER_ID:
 
-                        else:
-                    
-                            if humor == "motivado":
-                                resposta = "BOM DIA! Já tô pronto pro expediente! ☀️"
-                    
-                            elif humor == "neutro":
-                                resposta = "Bom dia. O expediente já começou, qual o lanche de hoje?"
+                respostas_chefe = {
+                    "motivado": "B-bom dia, chefia! Já tô acima da meta :3",
+                    "neutro": "Oi, chefia. Tudo certo nesse setor.",
+                    "cansado": "Bom dia, chefia... Posso bater o ponto depois? 😔",
+                    "revoltado": "Ah, bom dia, chefia... Sobre aquele meu salário...",
+                    "triste": "Bom dia, chefia... Se é que tá bom dia, né... 😢"
+                }
 
-                            elif humor == "cansado":
-                                resposta = "Bom dia... já? Ainda tô com sono... 😴"
-                    
-                            elif humor == "revoltado":
-                                resposta = "Bom dia só se for pra você, porque o dia tá uma droga. 😡"
-                            elif humor == "triste":
-                                resposta = "Bom dia... se é que dá pra chamar isso de dia... 😔"
+                resposta = respostas_chefe.get(humor)
 
-                                await message.reply(resposta)
-                                return
-                            
-                            await bot.process_commands(message)
+    else:
+    
+        respostas_cliente = {
+        "motivado": "Bom dia! Qual vai ser o pedido de hoje? 😄",
+        "neutro": "Olá. Faz o pedido aí.",
+        "cansado": "Bom dia... Escolhe rápido pra eu ir pra casa...",
+        "revoltado": "Bom dia. Estamos sob protesto.",
+        "triste": "Bom dia... o que cê quer?"
+    }
+    resposta = respostas_cliente.get(humor)
+
+    await message.reply(resposta)
+    return
+
+    await bot.process_commands(message) 
+
 
 
                 
@@ -192,13 +185,6 @@ def remover_acentos(texto):
         c for c in unicodedata.normalize('NFD', texto)
         if unicodedata.category(c) != 'Mn'
     )
-
-def humor_do_dia():
-    hoje = date.today()
-
-    random.seed(hoje.toordinal())
-    return random.choice(HUMORES)
-
 
 async def load_cogs():
     for filename in os.listdir("./cogs"):
