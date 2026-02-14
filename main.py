@@ -70,41 +70,16 @@ async def on_message(message):
     if message.author.bot:
         return
     
-    global humor, interacoes
+    if message.author.bot:
+        return
 
-    interacoes += 1
+    conteudo = message.content.lower().strip()
+    palavras = conteudo.split()
+    humor = humor_do_dia()
 
-    if interacoes > 40:
-        humor = "animado"
-    elif interacoes > 80:
-        humor = "cansado"
-    
-    chance = 0.
-
-    if humor == "animado":
-        chance = 0.
-    elif humor == "cansado":
-        chance = 0.
-
-    if random.random() < chance:
-        emoji_id = random.choice(EMOJIS_IDS)
-        emoji = bot.get_emoji(emoji_id)
-
-        if emoji:
-            try:
-                await message.add_reaction(emoji)
-            except:
-                pass
-    
-    if bot.user in message.mentions:
-        conteudo = message.content.lower().split()
-
-        if len(conteudo) >= 2:
-            primeira_palavra = conteudo[0]
-            
-            if primeira_palavra == "oi":
-                async with message.channel.typing():
-                    await asyncio.sleep(1.5)
+    if palavras and palavras[0] == "oi" and bot.user in message.mentions:
+                    async with message.channel.typing():
+                        await asyncio.sleep(1.5)
 
                     if message.author.id == config.OWNER_ID:
                         if humor == "motivado":
@@ -138,8 +113,10 @@ async def on_message(message):
                             elif humor == "triste":
                                 resposta = "Bom dia... se é que dá pra chamar isso de dia... 😔"
 
-                        await message.reply(resposta)
-                        return
+                                await message.reply(resposta)
+                                return
+                            
+                            await bot.process_commands(message)
 
 
                 
