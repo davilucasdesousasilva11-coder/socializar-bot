@@ -61,6 +61,14 @@ async def on_ready():
     from database import database
     humor = humor_do_dia()
 
+    await bot.change_presence(
+
+        activity=discord.CustomActivity(
+            name="🫦 | A Kioyichi é tão perfeita... <3",
+            emoji="👑"
+        )
+    )
+
     database.setup()
     
     print("=" * 40)
@@ -76,13 +84,6 @@ async def on_ready():
         print(f"Slash commands sincronizados: {len(synced)}")
     except Exception as e:
         print(e)
-
-    await bot.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.listening, 
-            name="Reclamações da patroa. 🍔"
-        )
-    )
 
 @bot.event
 async def on_message(message):
