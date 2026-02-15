@@ -7,6 +7,7 @@ from datetime import datetime, date
 import traceback
 import random
 import unicodedata
+import time
 
 import config
 
@@ -38,6 +39,21 @@ CHANCES = {
     "revoltado": 0.15,
     "triste": 0.10
 }
+
+estado_bot = {
+    "energia": 100,
+    "ultimo_regenerar": time.time()
+}
+
+def regenerar_energia():
+    agora = time.time()
+    tempo_passado = agora - estado_bot["ultimo_regenerar"]
+
+    if tempo_passado >= 300:
+
+        estado_bot["energia"] = min(100, estado_bot["energia"] + 2)
+        
+        estado_bot["ultimo_regenerar"] = agora
 
 @bot.event
 async def on_ready():
@@ -72,13 +88,17 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
+    
+    regenerar_energia()
+
+    tempo_digitando = 1.5 if estado_bot["energia"] >= 20 else 3
 
     conteudo = message.content.lower().strip()
 
     if conteudo.startswith("oi") and bot.user in message.mentions:
             
             async with message.channel.typing():
-                await asyncio.sleep(1)
+                await asyncio.sleep(tempo_digitando)
 
                 if message.author.id == config.OWNER_ID:
                     await message.channel.send(
@@ -92,40 +112,13 @@ async def on_message(message):
 
                         f"{message.author.mention} Bom dia! Em que posso te ajudar hoje? :3"
                     )
+
+                    estado_bot["energia"] -= 5
+                    estado_bot["energia"] = max(0, estado_bot["energia"])
                     return
 
             await bot.process_commands(message)
-
-    humor = humor_do_dia()
-    chance = CHANCES.get(humor, 0.25)
-
-    if (
-        len(message.content) > 4 and not message.content.startswith(config.PREFIX)
-        and random.random() < chance
-    ):
-        
-        try:
-            emojis_disponiveis = []
-
-            nomes_emojis = ["Bocchi_Cruz", "Bocchi_Cry", "Bocchi_Medu", "Bocchi_Overload", "Bocchi_Noooo", "Bocchi_Que", "Bocchi_Wah", "Bocchi_Yay", "Ryo_Dedo"]
-
-            for nome in nomes_emojis:
-                emoji = discord.utils.get(message.guild.emojis, name=nome)
-                if emoji:
-
-                    emojis_disponiveis.append(emoji)
-
-                    if not emojis_disponiveis:
-                        emojis_disponiveis = ["🎸", "💸", "🍔"]
-
-                        emoji_escolhido = random.choice(emojis_disponiveis)
-
-                        await message.add_reaction(emoji_escolhido)
-
-        except:
-            pass
-
-                
+                            
     if message.author.bot:
         return
     
@@ -135,7 +128,7 @@ async def on_message(message):
 
         if "e o salario" in conteudo:
             async with message.channel.typing():
-                await asyncio.sleep(2)
+                await asyncio.sleep(tempo_digitando)
                 await message.reply(
                     "O salário tá atrasado, Yume. 😔"
                 )
@@ -148,7 +141,7 @@ async def on_message(message):
         and "socializar" in conteudo
     ):
         async with message.channel.typing():
-            await asyncio.sleep(1.5)
+            await asyncio.sleep(tempo_digitando)
 
         if message.author.id == config.OWNER_ID:
             await message.channel.send(f"{message.author.mention} Você, senhorita Kio. 👑")
@@ -161,7 +154,9 @@ async def on_message(message):
         f"<@{bot.user.id}>",
         f"<@!{bot.user.id}"
     ):
-        async with message.channel.typing():
+        if estado_bot["energia"] < 20:
+            await asyncio.sleep(2)
+        else:
             await asyncio.sleep(1)
         await message.channel.send(
             f"👋 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
