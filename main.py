@@ -57,18 +57,6 @@ def regenerar_energia():
         
         estado_bot["ultimo_regenerar"] = agora
 
-@tasks.loop(seconds=60)
-async def atualizar_status():
-
-    energia = estado_bot["energia"]
-
-    await bot.change_presence(
-
-        activity=discord.CustomActivity(
-            name=f"Energia operacional: {energia}%",
-            emoji="☀️" if energia >= 50 else "🌙")
-        )
-
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -90,6 +78,31 @@ async def on_ready():
         print(f"Slash commands sincronizados: {len(synced)}")
     except Exception as e:
         print(e)
+
+    atualizar_status.start()
+
+@tasks.loop(seconds=60)
+async def atualizar_status():
+
+    energia = estado_bot["energia"]
+
+    if energia > 75:
+        emoji = "☀️"
+    elif energia > 50:
+        emoji = "🌤️"
+    elif energia > 25:
+        emoji = "⛈️"
+    else:
+        emoji = "🌙"
+
+    await bot.change_presence(
+        activity=discord.CustomActivity(
+            name=f"Energia operacional: {energia}%",
+            emoji=emoji
+        )
+    )
+
+
 
 @bot.event
 async def on_message(message):
