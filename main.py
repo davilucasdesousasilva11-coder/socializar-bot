@@ -249,6 +249,14 @@ async def on_message(message):
         estado_bot["energia"] = max(0, estado_bot["energia"])
         return
     
+    conteudo = message.content.lower().replace("", "").strip()
+
+    if conteudo.startswith("tendi") or " tendeu " in conteudo:
+        async with message.channel.typing():
+            await asyncio.sleep(tempo_digitando)
+            await message.reply("tendi também :P")
+            return
+    
     await bot.process_commands(message)
 
 def remover_acentos(texto):
