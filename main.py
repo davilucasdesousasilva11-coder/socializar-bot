@@ -199,13 +199,14 @@ async def on_message(message):
         f"<@!{bot.user.id}>"
     ):
         if estado_bot["energia"] < 20:
-            await asyncio.sleep(2)
+            async with message.channel.typing():
+                await asyncio.sleep(2)
         else:
             await asyncio.sleep(1)
         await message.channel.send(
-            f"👋 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
-            f"Ainda estou em desenvolvimento 🚧\n"
-            f"Em breve terei comandos e funcionalidades novas!"
+            f"🫂 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
+            f"🔨 Atualmente, ainda estou em **desenvolvimento**\n"
+            f"👑 Fale com minha criadora **Kioyichi** caso tenha alguma dúvida!"
         )
 
     if message.reference and message.reference.resolved:
