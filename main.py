@@ -251,7 +251,7 @@ async def on_message(message):
     
     conteudo = message.content.lower().replace("", "").strip()
 
-    if conteudo.startswith("tendi") or " tendeu " in conteudo:
+    if conteudo.startswith("tendi") or "tendeu" in conteudo:
         async with message.channel.typing():
             await asyncio.sleep(tempo_digitando)
             await message.reply("tendi também :P")
