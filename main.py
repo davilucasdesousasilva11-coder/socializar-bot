@@ -11,6 +11,8 @@ import time
 
 import config
 
+memoria_usuarios = {}
+
 def humor_do_dia():
     hoje = date.today()
 
@@ -65,7 +67,6 @@ async def on_ready():
 
         activity=discord.CustomActivity(
             name="🫦 | A Kioyichi é tão perfeita... <3",
-            emoji="👑"
         )
     )
 
@@ -90,6 +91,18 @@ async def on_message(message):
     if message.author.bot:
         return
     
+    user_id = message.author.id
+
+    if user_id not in memoria_usuarios:
+        memoria_usuarios[user_id] = {
+            "mensagens": 0,
+            "ultima_interacao": None,
+            "usou_oi": False
+        }
+
+        memoria_usuarios[user_id]["mensagens"] += 1
+        memoria_usuarios[user_id]["ultima_interacao"] = time.time()
+    
     regenerar_energia()
 
     tempo_digitando = 1.5 if estado_bot["energia"] >= 20 else 3
@@ -102,6 +115,10 @@ async def on_message(message):
                 await asyncio.sleep(tempo_digitando)
 
                 if message.author.id == config.OWNER_ID:
+
+                    memoria_usuarios[user_id]["usou_oi"] = True
+
+
                     await message.channel.send(
 
                         f"{message.author.mention} B-bom dia, senhorita Kio! Eu não tava dormindo no serviço não, juro :3"
@@ -109,6 +126,9 @@ async def on_message(message):
                     return
 
                 else:
+
+                    memoria_usuarios[user_id]["usou_oi"] = True
+
                     await message.channel.send(
 
                         f"{message.author.mention} Bom dia! Em que posso te ajudar hoje? :3"
@@ -133,6 +153,11 @@ async def on_message(message):
                 await message.reply(
                     "O salário tá atrasado, Yume. 😔"
                 )
+
+                estado_bot["energia"] -= 3
+                estado_bot["energia"] = max(0, estado_bot["energia"])
+
+                return
 
 
     conteudo = message.content.lower()
@@ -165,26 +190,17 @@ async def on_message(message):
             f"Em breve terei comandos e funcionalidades novas!"
         )
 
-    if bot.user in message.mentions:
-
-        if message.reference:
-            try:
-                msg_referenciada = await message.channel.fetch_message(
-
-                    message.reference.message_id
-                )
-                if msg_referenciada.author.id == bot.user.id:
-                    return
-            except:
-                pass
+    if message.reference and message.reference.resolved:
+        if message.reference.resolved.author == bot.user:
 
             async with message.channel.typing():
-                await asyncio.sleep(1)
-                await message.channel.send(
-                    f"Oi {message.author.mention}! 👋\nSe precisar de ajuda, é só falar comigo ou com a Kio!"
+                await asyncio.sleep(tempo_digitando)
 
+                await message.channel.send(
+                    f"{message.author.mention} Posso te ajudar em algo? :3"
                 )
 
+                estado_bot["energia"] -= 4
                 return
 
         await bot.process_commands(message)
