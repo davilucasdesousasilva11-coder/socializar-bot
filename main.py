@@ -52,10 +52,10 @@ def regenerar_energia():
     tempo_passado = agora - estado_bot["ultimo_regenerar"]
 
     if tempo_passado >= 300:
-
         estado_bot["energia"] = min(100, estado_bot["energia"] + 2)
-        
+
         estado_bot["ultimo_regenerar"] = agora
+
 
 @bot.event
 async def on_ready():
@@ -81,27 +81,27 @@ async def on_ready():
 
     atualizar_status.start()
 
-@tasks.loop(seconds=60)
+@tasks.loop(minutes=5)
 async def atualizar_status():
 
-    energia = estado_bot["energia"]
+    humor = humor_do_dia()
 
-    if energia > 75:
-        emoji = "☀️"
-    elif energia > 50:
-        emoji = "🌤️"
-    elif energia > 25:
-        emoji = "⛈️"
-    else:
-        emoji = "🌙"
+    emojis = {
+        "motivado": "🔥",
+        "neutro": "😐",
+        "cansado": "😴",
+        "revoltado": "😡",
+        "triste": "🌧️"
+    }
+
+    emoji = emojis.get(humor, "😐")
 
     await bot.change_presence(
-        activity=discord.CustomActivity(
-            name=f"Energia operacional: {energia}%",
-            emoji=emoji
-        )
-    )
 
+    activity=discord.CustomActivity(
+        name=f"{emoji} Humor atual: {humor}"
+    )
+)
 
 
 @bot.event
@@ -109,10 +109,13 @@ async def on_message(message):
     if message.author.bot:
         return
     
+    regenerar_energia()
+    
     user_id = message.author.id
 
     if user_id not in memoria_usuarios:
         memoria_usuarios[user_id] = {
+
             "mensagens": 0,
             "ultima_interacao": None,
             "usou_oi": False
@@ -120,8 +123,6 @@ async def on_message(message):
 
         memoria_usuarios[user_id]["mensagens"] += 1
         memoria_usuarios[user_id]["ultima_interacao"] = time.time()
-    
-    regenerar_energia()
 
     tempo_digitando = 1.5 if estado_bot["energia"] >= 20 else 3
 
@@ -141,6 +142,8 @@ async def on_message(message):
 
                         f"{message.author.mention} B-bom dia, senhorita Kio! Eu não tava dormindo no serviço não, juro :3"
                     )
+                    estado_bot["energia"] -= 5
+                    estado_bot["energia"] = max(0, estado_bot["energia"])
                     return
 
                 else:
@@ -157,9 +160,6 @@ async def on_message(message):
                     return
 
             await bot.process_commands(message)
-                            
-    if message.author.bot:
-        return
     
     if message.author.id == config.YUME_ID and bot.user in message.mentions:
         conteudo = message.content.lower()
@@ -196,7 +196,7 @@ async def on_message(message):
     if message.content.strip()in (
 
         f"<@{bot.user.id}>",
-        f"<@!{bot.user.id}"
+        f"<@!{bot.user.id}>"
     ):
         if estado_bot["energia"] < 20:
             await asyncio.sleep(2)
