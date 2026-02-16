@@ -194,7 +194,7 @@ async def on_message(message):
             return
 
     if message.content.strip() in (
-        f"<@bot.user.id>",
+        f"<@{bot.user.id}>",
         f"<@${bot.user.id}>"
     ):
         tempo_digitando = 1.2 if estado_bot["energia"] >= 20 else 2.5
