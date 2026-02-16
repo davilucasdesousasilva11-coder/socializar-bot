@@ -232,8 +232,21 @@ async def on_message(message):
 
                 estado_bot["energia"] -= 4
                 return
+    if (
+        message.author.id == config.YUME_ID and bot.user in message.mentions and "te amo" in message.content.lower()
+    ):
+        async with message.channel.typing():
+            await asyncio.sleep(tempo_digitando)
 
-        await bot.process_commands(message)
+        await message.reply(
+            f"Eu também te amo, {message.author.mention} :3 💖"
+        )
+
+        estado_bot["energia"] -= 3
+        estado_bot["energia"] = max(0, estado_bot["energia"])
+        return
+    
+    await bot.process_commands(message)
 
 def remover_acentos(texto):
     return ''.join(
