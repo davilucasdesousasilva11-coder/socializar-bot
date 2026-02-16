@@ -193,26 +193,32 @@ async def on_message(message):
             await message.channel.send(f'{message.author.mention} Minha criadora se chama "Kioyichi". 👑')
             return
 
-    if message.content.strip()in (
-
-        f"<@{bot.user.id}>",
-        f"<@!{bot.user.id}>"
+    if message.content.strip() in (
+        f"<@bot.user.id>",
+        f"<@${bot.user.id}>"
     ):
-            async with message.channel.typing():
-                await asyncio.sleep(tempo_digitando)
-            
+        tempo_digitando = 1.2 if estado_bot["energia"] >= 20 else 2.5
+
+        async with message.channel.typing():
+            await asyncio.sleep(tempo_digitando)
+
             if message.author.id == config.OWNER_ID:
-                await message.channel.send*(f"🫡 {message.author.mention} Oi, senhorita Kio! Precisa de algo? Algum teste em mim? Ou seria o meu tão sonhado salário...? 💸 :3")
+
+                resposta = (
+                    f"👑 {message.author.mention} Oi, senhorita Kio! Eu tô aqui pra te ajudar no que precisar :3"
+                )
             else:
-                await message.channel.send(
-                    await message.channel.send(
+                resposta = (
             f"🫂 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"🔨 Atualmente, ainda estou em **desenvolvimento**\n"
             f"👑 Fale com minha criadora **Kioyichi** caso tenha alguma dúvida!"
         )
-                )
-                return
+                await message.channel.send(resposta)
 
+                estado_bot["energia"] -= 4
+                estado_bot["energia"] = max(0, estado_bot["energia"])
+                return
+            
     if message.reference and message.reference.resolved:
         if message.reference.resolved.author == bot.user:
 
