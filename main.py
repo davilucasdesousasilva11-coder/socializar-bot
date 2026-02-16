@@ -231,8 +231,12 @@ async def on_message(message):
 
                 estado_bot["energia"] -= 4
                 return
+
+    conteudo = message.content.lower()
+
+
     if (
-        message.author.id == config.YUME_ID and bot.user in message.mentions and "te amo" in message.content.lower()
+        message.author.id == config.YUME_ID and bot.user in message.mentions and any(conteudo.startswith(frase) for frase in ["eu te amo", "te amo"])
     ):
         async with message.channel.typing():
             await asyncio.sleep(tempo_digitando)
