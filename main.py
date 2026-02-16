@@ -252,34 +252,14 @@ async def on_message(message):
     conteudo = message.content.lower().strip()
 
     if conteudo in ["tendi", "tendeu", "entendi"]:
+        async with message.channel.typing():
+            await asyncio.sleep(tempo_digitando)
+            await message.reply("eu também tendi :P")
+            return
 
-        if message.reference and message.reference.message_id:
-            try:
-                mensagem_original = await message.channel.fetch_message(
-
-                    message.reference.message_id
-                )
-
-                if mensagem_original.author.id == bot.user.id:
-                    async with message.channel.typing():
-                        await asyncio.sleep(tempo_digitando)
-
-                    await message.reply(
-                        "tendi também :P"
-                    )
-                    return
-            except:
-                    pass
-            
-            async with message.channel.typing():
-                await asyncio.sleep(tempo_digitando)
-                await message.reply(
-                    "eu também tendi :D"
-                )
-
-                estado_bot["energia"] -= 2
-                estado_bot["energia"] = max(0, estado_bot["energia"])
-                return
+        estado_bot["energia"] -= 2
+        estado_bot["energia"] = max(0, estado_bot["energia"])
+        return
     
     await bot.process_commands(message)
 
