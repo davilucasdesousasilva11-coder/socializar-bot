@@ -206,19 +206,18 @@ async def on_message(message):
                         f"👑 {message.author.mention} Oi, senhorita Kio! Tô aqui caso precise de testes! :3")
                     return
         else:
-                resposta = (
+            async with message.channel.typing():
+                await asyncio.sleep(tempo_digitando)
+            await message.channel.send(
             f"🫂 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"🔨 Atualmente, ainda estou em **desenvolvimento**\n"
             f"👑 Fale com minha criadora **Kioyichi** caso tenha alguma dúvida!"
         )
-                async with message.channel.typing():
-                    await asyncio.sleep(tempo_digitando)
+            
 
-                await message.channel.send(resposta)
-
-                estado_bot["energia"] -= 4
-                estado_bot["energia"] = max(0, estado_bot["energia"])
-                return
+            estado_bot["energia"] -= 4
+            estado_bot["energia"] = max(0, estado_bot["energia"])
+            return
             
     if message.reference and message.reference.resolved:
         if message.reference.resolved.author == bot.user:
