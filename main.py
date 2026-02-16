@@ -199,20 +199,21 @@ async def on_message(message):
     ):
         tempo_digitando = 1.2 if estado_bot["energia"] >= 20 else 2.5
 
-        async with message.channel.typing():
-            await asyncio.sleep(tempo_digitando)
 
-            if message.author.id == config.OWNER_ID:
+        if message.author.id == config.OWNER_ID:
 
                 resposta = (
                     f"👑 {message.author.mention} Oi, senhorita Kio! Eu tô aqui pra te ajudar no que precisar :3"
                 )
-            else:
+        else:
                 resposta = (
             f"🫂 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"🔨 Atualmente, ainda estou em **desenvolvimento**\n"
             f"👑 Fale com minha criadora **Kioyichi** caso tenha alguma dúvida!"
         )
+                async with message.channel.typing():
+                    await asyncio.sleep(tempo_digitando)
+                    
                 await message.channel.send(resposta)
 
                 estado_bot["energia"] -= 4
