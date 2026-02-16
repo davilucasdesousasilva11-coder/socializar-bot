@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import os
 import asyncio
 import sqlite3
@@ -57,18 +57,23 @@ def regenerar_energia():
         
         estado_bot["ultimo_regenerar"] = agora
 
+@tasks.loop(seconds=60)
+async def atualizar_status():
+
+    energia = estado_bot["energia"]
+
+    await bot.change_presence(
+
+        activity=discord.CustomActivity(
+            name=f"Energia operacional: {energia}%",
+            emoji="☀️" if energia >= 50 else "🌙")
+        )
+
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
     humor = humor_do_dia()
-
-    await bot.change_presence(
-
-        activity=discord.CustomActivity(
-            name="🫦 | A Kioyichi é tão perfeita... <3",
-        )
-    )
 
     database.setup()
     
