@@ -92,14 +92,12 @@ def regenerar_energia():
 
         estado_bot["ultimo_regenerar"] = agora
 
-status_index = 0
-
 @tasks.loop(seconds=5)
 async def atualizar_status():
     global status_index
-    
+
     servidores = len(bot.guilds)
-    usuarios = sum(g.members_count for g in bot.guilds)
+    usuarios = sum(g.member_count for g in bot.guilds)
 
     lista_status = [
         f"🎭 Humor:{humor_atual}",
@@ -111,27 +109,21 @@ async def atualizar_status():
     ]
 
     activity = discord.Activity(
+
         type=discord.ActivityType.custom,
 
-        name=lista_status[status_index]
+        state=lista_status[status_index]
     )
 
     await bot.change_presence(activity=activity)
 
-    status_index = (status_index +1) % len(lista_status)
+    status_index = (status_index + 1) % len(lista_status)
 
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
-    carregar_estado()
-    atualizar_humor_diario()
-
-    if not atualizar_status.is_running():
-        atualizar_status.start()
-
-        print("Custom status iniciado. 🎭")
-
+    
     database.setup()
     
     print("=" * 40)
@@ -148,8 +140,13 @@ async def on_ready():
     except Exception as e:
         print(e)
 
+        carregar_estado()
+    atualizar_humor_diario()
 
+    if not atualizar_status.is_running():
+        atualizar_status.start()
 
+        print("Custom status iniciado. 🎭")
 
 @bot.event
 async def on_message(message):
