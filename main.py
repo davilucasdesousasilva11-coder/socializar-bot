@@ -14,6 +14,23 @@ import config
 
 memoria_usuarios = {}
 
+tempo_inicio = time.time()
+
+EMOTION_FILE = "emotion_state.json"
+
+humor_atual = "neutro"
+nivel_emocional = 0
+ultimo_dia = None
+
+def verificar_cansaco():
+    global humor_atual
+
+    horas_online = (time.time() - tempo_inicio) / 3600
+
+    if horas_online >= 6:
+        humor_atual = "cansado"
+
+
 def carregar_estado():
     global humor_atual, nivel_emocional, ultimo_dia
 
@@ -21,16 +38,13 @@ def carregar_estado():
         with open(EMOTION_FILE, "r") as f:
             dados = json.load(f)
             humor_atual = dados["humor"]
-            nivel_emocional = dados["nível"]
+            nivel_emocional = dados["nivel"]
             ultimo_dia = dados["dia"]
     except:
-        humor_atual = "neutro"
-        nivel_emocional = 0
-        ultimo_dia = None
+        salvar_estado()
 
 def salvar_estado():
     with open(EMOTION_FILE, "w") as f:
-
         json.dump({
             "humor": humor_atual,
             "nivel": nivel_emocional,
@@ -44,24 +58,36 @@ def atualizar_humor_diario():
 
     if ultimo_dia != hoje:
         ultimo_dia = hoje
+        
+        humores = [
+            "feliz",
+            "neutro",
+            "irritado",
+            "triste",
+            "cansado",
+            "amoroso"
+        ]
+
+        humor_atual = random.choice(humores)
 
         if humor_atual == "feliz":
-            humor_atual = random.choices(
-
-                ["feliz", "neutro", "irritado"],
-                weights=[50, 30, 20]
-            )[0]
-
+            nivel_emocional = random.randint(4, 7)
+        elif humor_atual == "neutro":
+            nivel_emocional = random.randint(-2, 2)
         elif humor_atual == "irritado":
-            humor_atual = random.choices(
-                ["irritado", "neutro", "feliz"],
-                weights=[50, 30, 20]
-            )[0]
+            nivel_emocional = random.randint(-12, -8)
+        elif humor_atual == "triste":
+            nivel_emocional = random.randint(-7, -4)
+        elif humor_atual == "amoroso":
+            nivel_emocional = random.randint(8, 12)
+        elif humor_atual == "cansado":
+            nivel_emocional = random.randint(-3, 1)
 
-        else:
-            humor_atual = random.choice(["feliz", "neutro", "irritado"])
-                                         
             salvar_estado()
+
+
+
+
 
 
 bot = commands.Bot(
@@ -71,11 +97,6 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
-EMOTION_FILE = "emotion_state.json"
-
-humor_atual = "neutro"
-nivel_emocional = 0
-ultimo_dia = None
 
 
 estado_bot = {
@@ -92,36 +113,12 @@ def regenerar_energia():
 
         estado_bot["ultimo_regenerar"] = agora
 
-@tasks.loop(seconds=5)
-async def atualizar_status():
-    global status_index
-
-    servidores = len(bot.guilds)
-    usuarios = sum(g.member_count for g in bot.guilds)
-
-    lista_status = [
-        f"🎭 Humor:{humor_atual}",
-        f"🌡️ Nível Emocional: {nivel_emocional}",
-        f"👀 Observando {usuarios} humanos...",
-        f"🩷 Online para {servidores} servidores",
-        f"🧠 Desenvolvendo autoconsciência...",
-        f"😵‍💫 ERRO 404: SALÁRIO NOT FOUND"
-    ]
-
-    activity = discord.CustomActivity(
-
-        name=lista_status[status_index], emoji="🎭"
-    )
-
-    await bot.change_presence(activity=activity)
-
-    status_index = (status_index + 1) % len(lista_status)
 
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
-    
+
     database.setup()
     
     print("=" * 40)
@@ -129,7 +126,7 @@ async def on_ready():
     print(f"🆔 ID: {bot.user.id}")
     print(f"🌐 Servidores: {len(bot.guilds)}")
     print("🚀 Sistema inicializado com sucesso.")
-    print(f"🎭 Humor atual: {humor_atual}")
+    print(f"🎭 Humor do dia: {humor_atual}")
     print("=" * 40)
 
     try:
@@ -138,40 +135,54 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-        carregar_estado()
+    carregar_estado()
     atualizar_humor_diario()
 
     if not atualizar_status.is_running():
         atualizar_status.start()
 
-        print("Custom status iniciado. 🎭")
+@tasks.loop(seconds=5)
+async def atualizar_status():
+    global status_index
+
+    await bot.wait_until_ready()
+
+    servidores = len(bot.guilds)
+    usuarios = sum(g.member_count for g in bot.guilds)
+
+    emojis = {
+        "feliz": "😀",
+        "neutro": "😐",
+        "irritado": "😤",
+        "triste": "😭",
+        "cansado": "😴",
+        "amoroso": "😍"
+    }
+
+
+    lista_status = [
+        f"🎭 Humor atual: {humor_atual}",
+        f"🌡️ Nível emocional: {nivel_emocional}",
+        f"👀 Observando {usuarios} usuarios",
+        f"🩷 Online para {servidores} servidores",
+    ]
+    
+    activity = discord.CustomActivity(
+
+        name=lista_status[status_index]
+    )
+
+    await bot.change_presence(activity=activity)
+
+    status_index = (status_index + 1) % len(lista_status)
+
+    verificar_cansaco()
+
 
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
-    
-    def ajustar_emocao(conteudo):
-        global nivel_emocional, humor_atual
-
-        palavras_boas = ["amo", "legal", "bom", "fofo"]
-        palavras_ruins = ["chato", "odeio", "burro", "ruim"]
-
-        if any(p in conteudo for p in palavras_boas):
-            nivel_emocional += 1
-        
-        if any(p in conteudo for p in palavras_ruins):
-            nivel_emocional -= 1
-
-        if nivel_emocional >= 5:
-            humor_atual = "feliz"
-
-        elif nivel_emocional <= -5:
-            humor_atual = "irritado"
-
-            salvar_estado()
-
-        
     
     regenerar_energia()
     
