@@ -32,7 +32,20 @@ HUMORES = [
     "cansado",
     "revoltado",
     "triste",
-    "amoroso"
+    "amoroso",
+    "feliz"
+]
+
+humores_validos = [
+    "amoroso",
+    "pensativo",
+    "desconfiado",
+    "assustado",
+    "feliz",
+    "neutro",
+    "irritado",
+    "triste",
+    "cansado"
 ]
 
 CHANCES = {
@@ -44,7 +57,8 @@ CHANCES = {
     "amoroso": 0.40,
     "pensativo": 0.25,
     "desconfiado": 0.12,
-    "assustado": 0.05
+    "assustado": 0.05,
+    "feliz": 0.55
 }
 
 estado_bot = {
@@ -100,7 +114,8 @@ async def atualizar_status():
         "amoroso": "😍",
         "pensativo": "🤔",
         "desconfiado": "🤨",
-        "assustado": "😱"
+        "assustado": "😱",
+        "feliz": "🥳"
     }
 
     emoji = emojis.get(humor, "😐")
@@ -134,6 +149,25 @@ async def on_message(message):
         memoria_usuarios[user_id]["ultima_interacao"] = time.time()
 
     tempo_digitando = 1.5 if estado_bot["energia"] >= 20 else 3
+
+    conteudo = message.content.lower()
+
+    if conteudo.startswith("fique "):
+
+        if message.author.id != config.OWNER_ID:
+
+            try:
+                parte = conteudo.replace("fique ", "")
+                novo_humor = parte.split(",")[0].strip()
+
+                if novo_humor in humores_validos:
+                    humor_atual = novo_humor
+                    await message.channel.send(f"{message.author.mention} Okay! Agora estou {novo_humor} :3")
+                else:
+                    await message.channel.send(f"Hmm, esse humor não existe, {message.author.mention} :(")
+            except:
+                await message.channel.send(f"Formato inválido, {message.author.mention} 😭")
+    
 
     conteudo = message.content.lower().strip()
 
