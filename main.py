@@ -84,12 +84,22 @@ async def on_ready():
 @tasks.loop(minutes=5)
 async def atualizar_status():
 
-    servidores = (bot.guilds)
+    humor = humor_do_dia()
+
+    emojis = {
+        "motivado": "🔥",
+        "neutro": "😐",
+        "cansado": "😴",
+        "revoltado": "😡",
+        "triste": "🌧️"
+    }
+
+    emoji = emojis.get(humor, "😐")
 
     await bot.change_presence(
 
     activity=discord.CustomActivity(
-        name=f"🩷 Online para {servidores} servidores"
+        name=f"{emoji} Humor atual: {humor}"
     )
 )
 
