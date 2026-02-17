@@ -121,7 +121,7 @@ async def atualizar_status():
         "feliz": "🥳"
     }
 
-    emoji = emojis.get(humor_exibido, "😐")
+    emoji = emojis.get(humor_do_dia, "😐")
 
     await bot.change_presence(
 
@@ -156,6 +156,8 @@ async def on_message(message):
     conteudo = message.content.lower()
 
     if message.author.id == config.OWNER_ID and conteudo.startswith("fique "):
+            async with message.channel.typing():
+                await asyncio.sleep(tempo_digitando)
 
             try:
                 parte = conteudo.replace("fique ", "")
