@@ -122,37 +122,6 @@ async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
 
-    async def loop_status():
-        while True:
-            await bot.change_presence(
-
-                status=discord.Status.online,
-
-                activity=discord.Game(f"🎭 Humor atual: {humor_atual}")
-            )
-            await asyncio.sleep(5)
-
-            await bot.change_presence(status=discord.Status.online,
-
-                activity=discord.Game(f"🌡️ Nível emocional: {nivel_emocional}")
-            )
-            await asyncio.sleep(5)
-
-            await bot.change_presence(status=discord.Status.online,
-
-                activity=discord.Game(f"👀 Observando {usuarios} usuarios")
-            )
-            await asyncio.sleep(5)
-
-            await bot.change_presence(status=discord.Status.online,
-
-                activity=discord.Game(f"🩷 Online para {servidores} servidores")
-            )
-            await asyncio.sleep(5)
-
-            bot.loop.create_task(loop_status())
-
-
     database.setup()
     
     print("=" * 40)
@@ -171,6 +140,13 @@ async def on_ready():
 
     carregar_estado()
     atualizar_humor_diario()
+    
+    await bot.change_presence(
+
+        status=discord.Status.online,
+
+        activity=discord.Game(f"🩷 Online para {servidores} servidores")
+    )
 
 
 
