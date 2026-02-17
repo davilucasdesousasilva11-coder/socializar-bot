@@ -8,87 +8,16 @@ import traceback
 import random
 import unicodedata
 import time
-import json
 
 import config
 
 memoria_usuarios = {}
 
-tempo_inicio = time.time()
+def humor_do_dia():
+    hoje = date.today()
 
-EMOTION_FILE = "emotion_state.json"
-
-humor_atual = "neutro"
-nivel_emocional = 0
-ultimo_dia = None
-
-def verificar_cansaco():
-    global humor_atual
-
-    horas_online = (time.time() - tempo_inicio) / 3600
-
-    if horas_online >= 6:
-        humor_atual = "cansado"
-
-
-def carregar_estado():
-    global humor_atual, nivel_emocional, ultimo_dia
-
-    try:
-        with open(EMOTION_FILE, "r") as f:
-            dados = json.load(f)
-            humor_atual = dados["humor"]
-            nivel_emocional = dados["nivel"]
-            ultimo_dia = dados["dia"]
-    except:
-        salvar_estado()
-
-def salvar_estado():
-    with open(EMOTION_FILE, "w") as f:
-        json.dump({
-            "humor": humor_atual,
-            "nivel": nivel_emocional,
-            "dia": ultimo_dia
-        }, f)
-
-def atualizar_humor_diario():
-    global humor_atual, ultimo_dia
-
-    hoje = str(datetime.date.today())
-
-    if ultimo_dia != hoje:
-        ultimo_dia = hoje
-        
-        humores = [
-            "feliz",
-            "neutro",
-            "irritado",
-            "triste",
-            "cansado",
-            "amoroso"
-        ]
-
-        humor_atual = random.choice(humores)
-
-        if humor_atual == "feliz":
-            nivel_emocional = random.randint(4, 7)
-        elif humor_atual == "neutro":
-            nivel_emocional = random.randint(-2, 2)
-        elif humor_atual == "irritado":
-            nivel_emocional = random.randint(-12, -8)
-        elif humor_atual == "triste":
-            nivel_emocional = random.randint(-7, -4)
-        elif humor_atual == "amoroso":
-            nivel_emocional = random.randint(8, 12)
-        elif humor_atual == "cansado":
-            nivel_emocional = random.randint(-3, 1)
-
-            salvar_estado()
-
-
-
-
-
+    random.seed(hoje.toordinal())
+    return random.choice(HUMORES)
 
 bot = commands.Bot(
 
@@ -97,7 +26,21 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
+HUMORES = [
+    "motivado",
+    "neutro",
+    "cansado",
+    "revoltado",
+    "triste"
+]
 
+CHANCES = {
+    "motivado": 0.50,
+    "neutro": 0.35,
+    "cansado": 0.20,
+    "revoltado": 0.15,
+    "triste": 0.10
+}
 
 estado_bot = {
     "energia": 100,
@@ -114,13 +57,11 @@ def regenerar_energia():
         estado_bot["ultimo_regenerar"] = agora
 
 
-servidores = len(bot.guilds)
-usuarios = sum(g.member_count for g in bot.guilds)
-
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
+    humor = humor_do_dia()
 
     database.setup()
     
@@ -129,7 +70,7 @@ async def on_ready():
     print(f"🆔 ID: {bot.user.id}")
     print(f"🌐 Servidores: {len(bot.guilds)}")
     print("🚀 Sistema inicializado com sucesso.")
-    print(f"🎭 Humor do dia: {humor_atual}")
+    print(f"🎭 Humor do dia: {humor}")
     print("=" * 40)
 
     try:
@@ -138,17 +79,19 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    carregar_estado()
-    atualizar_humor_diario()
-    
+    atualizar_status.start()
+
+@tasks.loop(minutes=5)
+async def atualizar_status():
+
+    servidores = (bot.guilds)
+
     await bot.change_presence(
 
-        status=discord.Status.online,
-
-        activity=discord.Game(f"🩷 Online para {servidores} servidores")
+    activity=discord.CustomActivity(
+        name=f"🩷 Online para {servidores} servidores"
     )
-
-
+)
 
 
 @bot.event
