@@ -8,16 +8,61 @@ import traceback
 import random
 import unicodedata
 import time
+import json
 
 import config
 
 memoria_usuarios = {}
 
-def humor_do_dia():
-    hoje = date.today()
+def carregar_estado():
+    global humor_atual, nivel_emocional, ultimo_dia
 
-    random.seed(hoje.toordinal())
-    return random.choice(HUMORES)
+    try:
+        with open(EMOTION_FILE, "r") as f:
+            dados = json.load(f)
+            humor_atual = dados["humor"]
+            nivel_emocional = dados["nível"]
+            ultimo_dia = dados["dia"]
+    except:
+        humor_atual = "neutro"
+        nivel_emocional = 0
+        ultimo_dia = None
+
+def salvar_estado():
+    with open(EMOTION_FILE, "w") as f:
+
+        json.dump({
+            "humor": humor_atual,
+            "nivel": nivel_emocional,
+            "dia": ultimo_dia
+        }, f)
+
+def atualizar_humor_diario():
+    global humor_atual, ultimo_dia
+
+    hoje = str(datetime.date.today())
+
+    if ultimo_dia != hoje:
+        ultimo_dia = hoje
+
+        if humor_atual == "feliz":
+            humor_atual = random.choices(
+
+                ["feliz", "neutro", "irritado"],
+                weights=[50, 30, 20]
+            )[0]
+
+        elif humor_atual == "irritado":
+            humor_atual = random.choices(
+                ["irritado", "neutro", "feliz"],
+                weights=[50, 30, 20]
+            )[0]
+
+        else:
+            humor_atual = random.choice(["feliz", "neutro", "irritado"])
+                                         
+            salvar_estado()
+
 
 bot = commands.Bot(
 
@@ -26,21 +71,12 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
-HUMORES = [
-    "motivado",
-    "neutro",
-    "cansado",
-    "revoltado",
-    "triste"
-]
+EMOTION_FILE = "emotion_state.json"
 
-CHANCES = {
-    "motivado": 0.50,
-    "neutro": 0.35,
-    "cansado": 0.20,
-    "revoltado": 0.15,
-    "triste": 0.10
-}
+humor_atual = "neutro"
+nivel_emocional = 0
+ultimo_dia = None
+
 
 estado_bot = {
     "energia": 100,
@@ -56,12 +92,45 @@ def regenerar_energia():
 
         estado_bot["ultimo_regenerar"] = agora
 
+status_index = 0
+
+@tasks.loop(seconds=5)
+async def atualizar_status():
+    global status_index
+    
+    servidores = len(bot.guilds)
+    usuarios = sum(g.members_count for g in bot.guilds)
+
+    lista_status = [
+        f"🎭 Humor:{humor_atual}",
+        f"🌡️ Nível Emocional: {nivel_emocional}",
+        f"👀 Observando {usuarios} humanos...",
+        f"🩷 Online para {servidores} servidores",
+        f"🧠 Desenvolvendo autoconsciência...",
+        f"😵‍💫 ERRO 404: SALÁRIO NOT FOUND"
+    ]
+
+    activity = discord.Activity(
+        type=discord.ActivityType.custom,
+
+        name=lista_status[status_index]
+    )
+
+    await bot.change_presence(activity=activity)
+
+    status_index = (status_index +1) % len(lista_status)
 
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
-    humor = humor_do_dia()
+    carregar_estado()
+    atualizar_humor_diario()
+
+    if not atualizar_status.is_running():
+        atualizar_status.start()
+
+        print("Custom status iniciado. 🎭")
 
     database.setup()
     
@@ -70,7 +139,7 @@ async def on_ready():
     print(f"🆔 ID: {bot.user.id}")
     print(f"🌐 Servidores: {len(bot.guilds)}")
     print("🚀 Sistema inicializado com sucesso.")
-    print(f"🎭 Humor do dia: {humor}")
+    print(f"🎭 Humor atual: {humor_atual}")
     print("=" * 40)
 
     try:
@@ -79,35 +148,35 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    atualizar_status.start()
 
-@tasks.loop(minutes=5)
-async def atualizar_status():
-
-    humor = humor_do_dia()
-
-    emojis = {
-        "motivado": "🔥",
-        "neutro": "😐",
-        "cansado": "😴",
-        "revoltado": "😡",
-        "triste": "🌧️"
-    }
-
-    emoji = emojis.get(humor, "😐")
-
-    await bot.change_presence(
-
-    activity=discord.CustomActivity(
-        name=f"{emoji} Humor atual: {humor}"
-    )
-)
 
 
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
+    
+    def ajustar_emocao(conteudo):
+        global nivel_emocional, humor_atual
+
+        palavras_boas = ["amo", "legal", "bom", "fofo"]
+        palavras_ruins = ["chato", "odeio", "burro", "ruim"]
+
+        if any(p in conteudo for p in palavras_boas):
+            nivel_emocional += 1
+        
+        if any(p in conteudo for p in palavras_ruins):
+            nivel_emocional -= 1
+
+        if nivel_emocional >= 5:
+            humor_atual = "feliz"
+
+        elif nivel_emocional <= -5:
+            humor_atual = "irritado"
+
+            salvar_estado()
+
+        
     
     regenerar_energia()
     
