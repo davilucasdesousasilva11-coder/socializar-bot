@@ -114,10 +114,44 @@ def regenerar_energia():
         estado_bot["ultimo_regenerar"] = agora
 
 
+servidores = len(bot.guilds)
+usuarios = sum(g.member_count for g in bot.guilds)
+
 @bot.event
 async def on_ready():
     agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     from database import database
+
+    async def loop_status():
+        while True:
+            await bot.change_presence(
+
+                status=discord.Status.online,
+
+                activity=discord.Game(f"🎭 Humor atual: {humor_atual}")
+            )
+            await asyncio.sleep(5)
+
+            await bot.change_presence(status=discord.Status.online,
+
+                activity=discord.Game(f"🌡️ Nível emocional: {nivel_emocional}")
+            )
+            await asyncio.sleep(5)
+
+            await bot.change_presence(status=discord.Status.online,
+
+                activity=discord.Game(f"👀 Observando {usuarios} usuarios")
+            )
+            await asyncio.sleep(5)
+
+            await bot.change_presence(status=discord.Status.online,
+
+                activity=discord.Game(f"🩷 Online para {servidores} servidores")
+            )
+            await asyncio.sleep(5)
+
+            bot.loop.create_task(loop_status())
+
 
     database.setup()
     
@@ -138,45 +172,7 @@ async def on_ready():
     carregar_estado()
     atualizar_humor_diario()
 
-    if not atualizar_status.is_running():
-        atualizar_status.start()
 
-@tasks.loop(seconds=5)
-async def atualizar_status():
-    global status_index
-
-    await bot.wait_until_ready()
-
-    servidores = len(bot.guilds)
-    usuarios = sum(g.member_count for g in bot.guilds)
-
-    emojis = {
-        "feliz": "😀",
-        "neutro": "😐",
-        "irritado": "😤",
-        "triste": "😭",
-        "cansado": "😴",
-        "amoroso": "😍"
-    }
-
-
-    lista_status = [
-        f"🎭 Humor atual: {humor_atual}",
-        f"🌡️ Nível emocional: {nivel_emocional}",
-        f"👀 Observando {usuarios} usuarios",
-        f"🩷 Online para {servidores} servidores",
-    ]
-    
-    activity = discord.CustomActivity(
-
-        name=lista_status[status_index]
-    )
-
-    await bot.change_presence(activity=activity)
-
-    status_index = (status_index + 1) % len(lista_status)
-
-    verificar_cansaco()
 
 
 @bot.event
