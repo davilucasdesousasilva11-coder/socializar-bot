@@ -162,6 +162,31 @@ async def on_message(message):
 
                 if novo_humor in humores_validos:
                     humor_atual = novo_humor
+
+                    humor = humor_do_dia
+
+                    emojis = {
+        "motivado": "🔥",
+        "neutro": "😐",
+        "cansado": "😴",
+        "revoltado": "😤",
+        "triste": "😭",
+        "amoroso": "😍",
+        "pensativo": "🤔",
+        "desconfiado": "🤨",
+        "assustado": "😱",
+        "feliz": "🥳"
+     }
+                    emoji = emojis.get(humor, "😐")
+
+                    await bot.change_presence(
+
+                        status=discord.Status.online,
+
+                        activity=discord.CustomActivity(
+        name=f"{emoji} Humor atual: {humor}"
+    )
+                    )
                     await message.channel.send(f"{message.author.mention} Okay! Agora estou {novo_humor} :3")
                 else:
                     await message.channel.send(f"Hmm, esse humor não existe, {message.author.mention} :(")
