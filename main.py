@@ -108,11 +108,9 @@ async def atualizar_status():
         f"😵‍💫 ERRO 404: SALÁRIO NOT FOUND"
     ]
 
-    activity = discord.Activity(
+    activity = discord.CustomActivity(
 
-        type=discord.ActivityType.custom,
-
-        state=lista_status[status_index]
+        name=lista_status[status_index], emoji="🎭"
     )
 
     await bot.change_presence(activity=activity)
