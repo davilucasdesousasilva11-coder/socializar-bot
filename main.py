@@ -155,7 +155,7 @@ async def on_message(message):
 
     conteudo = message.content.lower()
 
-    if message.author.id == config.OWNER_ID and "fique " in conteudo:
+    if message.author.id == config.OWNER_ID and conteudo.startswith("fique "):
 
             try:
                 parte = conteudo.replace("fique ", "")
