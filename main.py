@@ -121,7 +121,7 @@ async def atualizar_status():
         "feliz": "🥳"
     }
 
-    emoji = emojis.get(humor_do_dia, "😐")
+    emoji = emojis.get(humor_do_dia, "🎭")
 
     await bot.change_presence(
 
