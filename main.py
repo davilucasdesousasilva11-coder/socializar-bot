@@ -26,6 +26,9 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
+humor_base = "neutro"
+humor_forcado = None
+
 HUMORES = [
     "motivado",
     "neutro",
@@ -103,7 +106,7 @@ async def on_ready():
 @tasks.loop(minutes=5)
 async def atualizar_status():
 
-    humor = humor_do_dia()
+    humor_exibido = humor_forcado if humor_forcado else humor_do_dia
 
     emojis = {
         "motivado": "🔥",
@@ -118,12 +121,12 @@ async def atualizar_status():
         "feliz": "🥳"
     }
 
-    emoji = emojis.get(humor, "😐")
+    emoji = emojis.get(humor_exibido, "😐")
 
     await bot.change_presence(
 
     activity=discord.CustomActivity(
-        name=f"{emoji} Humor atual: {humor}"
+        name=f"{emoji} Humor atual: {humor_exibido}"
     )
 )
 
@@ -152,18 +155,18 @@ async def on_message(message):
 
     conteudo = message.content.lower()
 
-    if conteudo.startswith("fique "):
-
-        if message.author.id != config.OWNER_ID:
+    if message.author.id == config.OWNER_ID and "fique " in conteudo:
 
             try:
                 parte = conteudo.replace("fique ", "")
                 novo_humor = parte.split(",")[0].strip()
 
                 if novo_humor in humores_validos:
-                    humor_atual = novo_humor
+                    humor_forcado = novo_humor
 
-                    humor = humor_do_dia
+                    await atualizar_status()
+
+                    humor_exibido = humor_forcado if humor_forcado else humor_do_dia
 
                     emojis = {
         "motivado": "🔥",
@@ -177,14 +180,14 @@ async def on_message(message):
         "assustado": "😱",
         "feliz": "🥳"
      }
-                    emoji = emojis.get(humor, "😐")
+                    emoji = emojis.get(humor_exibido, "😐")
 
                     await bot.change_presence(
 
                         status=discord.Status.online,
 
                         activity=discord.CustomActivity(
-        name=f"{emoji} Humor atual: {humor}"
+        name=f"{emoji} Humor atual: {humor_exibido}"
     )
                     )
                     await message.channel.send(f"{message.author.mention} Okay! Agora estou {novo_humor} :3")
