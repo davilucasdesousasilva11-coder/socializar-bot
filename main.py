@@ -44,7 +44,7 @@ CHANCES = {
     "amoroso": 0.40,
     "pensativo": 0.25,
     "desconfiado": 0.12,
-    "assustado": 0.40
+    "assustado": 0.05
 }
 
 estado_bot = {
@@ -147,9 +147,9 @@ async def on_message(message):
                     memoria_usuarios[user_id]["usou_oi"] = True
 
 
-                    await message.channel.reply(
+                    await message.channel.send(
 
-                        f"B-bom dia, senhorita Kio! Eu não tava dormindo no serviço não, juro :3"
+                        f"{message.author.mention} B-bom dia, senhorita Kio! Eu não tava dormindo no serviço não, juro :3"
                     )
                     estado_bot["energia"] -= 5
                     estado_bot["energia"] = max(0, estado_bot["energia"])
@@ -159,9 +159,9 @@ async def on_message(message):
 
                     memoria_usuarios[user_id]["usou_oi"] = True
 
-                    await message.channel.reply(
+                    await message.channel.send(
 
-                        f"Bom dia! Em que posso te ajudar hoje? :3"
+                        f"{message.author.mention} Bom dia! Em que posso te ajudar hoje? :3"
                     )
 
                     estado_bot["energia"] -= 5
@@ -197,9 +197,9 @@ async def on_message(message):
             await asyncio.sleep(tempo_digitando)
 
         if message.author.id == config.OWNER_ID:
-            await message.channel.reply("Você, senhorita Kio. 👑")
+            await message.channel.send(f"{message.author.mention} Você, senhorita Kio. 👑")
         else:
-            await message.channel.reply("Minha criadora se chama 'Kioyichi'. 👑")
+            await message.channel.send(f'{message.author.mention} Minha criadora se chama "Kioyichi". 👑')
             return
 
     if message.content.strip() in (
@@ -212,7 +212,7 @@ async def on_message(message):
                 async with message.channel.typing():
                     await asyncio.sleep(tempo_digitando)
                     await message.reply(
-                        "👑 Oi, senhorita Kio! Tô aqui caso precise de testes! :3")
+                        f"👑 {message.author.mention} Oi, senhorita Kio! Tô aqui caso precise de testes! :3")
                     return
         else:
             async with message.channel.typing():
@@ -234,8 +234,8 @@ async def on_message(message):
             async with message.channel.typing():
                 await asyncio.sleep(tempo_digitando)
 
-                await message.channel.reply(
-                    "Posso te ajudar em algo? :3"
+                await message.channel.send(
+                    f"{message.author.mention} Posso te ajudar em algo? :3"
                 )
 
                 estado_bot["energia"] -= 4
