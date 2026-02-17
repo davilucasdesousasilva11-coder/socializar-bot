@@ -126,7 +126,7 @@ async def atualizar_status():
     await bot.change_presence(
 
     activity=discord.CustomActivity(
-        name=f"{emoji} Humor atual: {humor_exibido}"
+        name=f"{emoji} Humor atual: {humor_do_dia()}"
     )
 )
 
