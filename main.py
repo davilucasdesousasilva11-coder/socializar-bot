@@ -41,7 +41,10 @@ CHANCES = {
     "cansado": 0.20,
     "revoltado": 0.15,
     "triste": 0.10,
-    "amoroso": 0.40
+    "amoroso": 0.40,
+    "pensativo": 0.25,
+    "desconfiado": 0.12,
+    "assustado": 0.40
 }
 
 estado_bot = {
@@ -94,7 +97,10 @@ async def atualizar_status():
         "cansado": "😴",
         "revoltado": "😤",
         "triste": "😭",
-        "amoroso": "😍"
+        "amoroso": "😍",
+        "pensativo": "🤔",
+        "desconfiado": "🤨",
+        "assustado": "😱"
     }
 
     emoji = emojis.get(humor, "😐")
