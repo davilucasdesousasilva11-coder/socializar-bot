@@ -263,7 +263,8 @@ async def on_message(message):
             async with message.channel.typing():
                 await asyncio.sleep(tempo_digitando)
                 await message.reply(
-                    "Nem ouse falar desse monstro... 😔"
+                    "Ainda macetando o Pocchi...\n"
+                    "ou provavelmente procurando corpos alheios por aí."
                 )
 
                 estado_bot["energia"] -= 3
@@ -306,7 +307,7 @@ async def on_message(message):
             await message.channel.send(
             f"🫂 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"🔨 Atualmente, ainda estou em **desenvolvimento**\n"
-            f"👑 Fale com minha sensei **Kioyichi** caso tenha alguma dúvida!"
+            f"👑 Fale com minha sensei **Kioyichi** caso tenha alguma dúvida!\n"
             f"⭐  Ora ora ora! (Star Platinum é o melhor 😏)"
         )
             
