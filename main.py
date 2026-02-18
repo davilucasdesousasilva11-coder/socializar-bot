@@ -1,3 +1,5 @@
+# ======= IMPORTS =======
+
 import discord
 from discord.ext import commands, tasks
 import os
@@ -10,6 +12,8 @@ import unicodedata
 import time
 
 import config
+
+# ======= CONFIGS. INICIAIS =======
 
 memoria_usuarios = {}
 
@@ -26,8 +30,12 @@ bot = commands.Bot(
 
 ultimo_usuario_que_mencionou = None
 
+# ======= SISTEMA DE HUMORES =======
+
 humor_base = "neutro"
 humor_forcado = None
+
+
 
 HUMORES = [
     "motivado",
@@ -64,6 +72,8 @@ CHANCES = {
     "feliz": 0.55
 }
 
+# ======= SISTEMA DE ENERGIA =======
+
 estado_bot = {
     "energia": 100,
     "ultimo_regenerar": time.time()
@@ -78,6 +88,8 @@ def regenerar_energia():
 
         estado_bot["ultimo_regenerar"] = agora
 
+
+# ======= EVENTOS =======
 
 @bot.event
 async def on_ready():
@@ -103,10 +115,12 @@ async def on_ready():
 
     atualizar_status.start()
 
+# ======= STATUS AUTOMÁTICO =======
+
 @tasks.loop(minutes=5)
 async def atualizar_status():
-
-    humor_exibido = humor_forcado if humor_forcado else humor_do_dia
+    global humor_forcado
+    humor_exibido = humor_forcado if humor_forcado else humor_do_dia()
 
     emojis = {
         "motivado": "🔥",
@@ -131,10 +145,16 @@ async def atualizar_status():
 )
 
 
+# ======= ON MESSAGE =======
+
 @bot.event
 async def on_message(message):
     if message.author.bot:
         return
+    
+    conteudo_original = message.content
+    conteudo = conteudo_original.lower().strip()
+    conteudo_sem_acentos = remover_acentos(conteudo)
     
     regenerar_energia()
     
@@ -153,7 +173,7 @@ async def on_message(message):
 
     tempo_digitando = 1.5 if estado_bot["energia"] >= 20 else 3
 
-    conteudo = message.content.lower()
+    # COMANDO DONO: FORÇAR HUMOR =======
 
     if message.author.id == config.OWNER_ID and conteudo.startswith("fique "):
             async with message.channel.typing():
@@ -182,7 +202,7 @@ async def on_message(message):
         "assustado": "😱",
         "feliz": "🥳"
      }
-                    emoji = emojis.get(humor_exibido, "😐")
+                    emoji = emojis.get(humor_do_dia, "🎭")
 
                     await bot.change_presence(
 
@@ -198,8 +218,7 @@ async def on_message(message):
             except:
                 await message.channel.send(f"Formato inválido, {message.author.mention} 😭")
     
-
-    conteudo = message.content.lower().strip()
+    # ======= SAUDAÇÃO =======
 
     if conteudo.startswith("oi") and bot.user in message.mentions:
             
@@ -213,7 +232,7 @@ async def on_message(message):
 
                     await message.channel.send(
 
-                        f"{message.author.mention} B-bom dia, senhorita Kio! Eu não tava dormindo no serviço não, juro :3"
+                        f"{message.author.mention} Sensei Kio! Hai! Eu estava treinando o meu Star Platinum :3"
                     )
                     estado_bot["energia"] -= 5
                     estado_bot["energia"] = max(0, estado_bot["energia"])
@@ -225,7 +244,7 @@ async def on_message(message):
 
                     await message.channel.send(
 
-                        f"{message.author.mention} Bom dia! Em que posso te ajudar hoje? :3"
+                        f"{message.author.mention} Hai! Como você está, civil? "
                     )
 
                     estado_bot["energia"] -= 5
@@ -233,16 +252,18 @@ async def on_message(message):
                     return
 
             await bot.process_commands(message)
+
+            # ======= RESPOSTA DIO =======
     
     if message.author.id == config.YUME_ID and bot.user in message.mentions:
         conteudo = message.content.lower()
         conteudo = remover_acentos(conteudo)
 
-        if "e o salario" in conteudo:
+        if "e o dio" in conteudo:
             async with message.channel.typing():
                 await asyncio.sleep(tempo_digitando)
                 await message.reply(
-                    "O salário tá atrasado, Yume. 😔"
+                    "Nem ouse falar desse monstro... 😔"
                 )
 
                 estado_bot["energia"] -= 3
@@ -251,7 +272,7 @@ async def on_message(message):
                 return
 
 
-    conteudo = message.content.lower()
+    # ======= RESPOSTA CRIADORA =======
 
     if (
         "quem" in conteudo and "criadora" in conteudo
@@ -261,9 +282,9 @@ async def on_message(message):
             await asyncio.sleep(tempo_digitando)
 
         if message.author.id == config.OWNER_ID:
-            await message.channel.send(f"{message.author.mention} Você, senhorita Kio. 👑")
+            await message.channel.send(f"{message.author.mention} Você, sensei Kio. 👑")
         else:
-            await message.channel.send(f'{message.author.mention} Minha criadora se chama "Kioyichi". 👑')
+            await message.channel.send(f'{message.author.mention} Minha sensei se chama "Kioyichi". 👑')
             return
 
     if message.content.strip() in (
@@ -271,12 +292,13 @@ async def on_message(message):
         f"<@${bot.user.id}>"
     ):
 
+        # ======= RESPOSTA A MENÇÃO DIRETA =======
 
         if message.author.id == config.OWNER_ID:
                 async with message.channel.typing():
                     await asyncio.sleep(tempo_digitando)
                     await message.reply(
-                        f"👑 {message.author.mention} Oi, senhorita Kio! Tô aqui caso precise de testes! :3")
+                        f"👑 {message.author.mention} Hai, Kio-sama! Tô aqui caso precise de testes! :3")
                     return
         else:
             async with message.channel.typing():
@@ -284,7 +306,8 @@ async def on_message(message):
             await message.channel.send(
             f"🫂 Olá, {message.author.mention}! Eu sou **{bot.user.name}**\n"
             f"🔨 Atualmente, ainda estou em **desenvolvimento**\n"
-            f"👑 Fale com minha criadora **Kioyichi** caso tenha alguma dúvida!"
+            f"👑 Fale com minha sensei **Kioyichi** caso tenha alguma dúvida!"
+            f"⭐  Ora ora ora! (Star Platinum é o melhor 😏)"
         )
             
 
@@ -292,6 +315,8 @@ async def on_message(message):
             estado_bot["energia"] = max(0, estado_bot["energia"])
             return
             
+    # ======= RESPOSTA A REPLIES =======
+
     if message.reference and message.reference.resolved:
         if message.reference.resolved.author == bot.user:
 
@@ -305,8 +330,8 @@ async def on_message(message):
                 estado_bot["energia"] -= 4
                 return
 
-    conteudo = message.content.lower()
-
+    
+    # ======= RESPOSTA RELAÇÃO SOCIYUME =======
 
     if (
         message.author.id == config.YUME_ID and bot.user in message.mentions and any(conteudo.startswith(frase) for frase in ["eu te amo", "te amo"])
@@ -315,19 +340,19 @@ async def on_message(message):
             await asyncio.sleep(tempo_digitando)
 
         await message.reply(
-            f"Eu também te amo, {message.author.mention} :3 💖"
+            f"Eu também te amo, {message.author.mention} 💙"
         )
 
         estado_bot["energia"] -= 3
         estado_bot["energia"] = max(0, estado_bot["energia"])
         return
     
-    conteudo = message.content.lower().strip()
+    # ======= RESPOSTA A TENDI =======
 
     if conteudo in ["tendi", "tendeu", "entendi"]:
         async with message.channel.typing():
             await asyncio.sleep(tempo_digitando)
-            await message.reply("eu também tendi :P")
+            await message.reply("eu entendi também, eu acho")
             return
 
         estado_bot["energia"] -= 2
@@ -335,6 +360,8 @@ async def on_message(message):
         return
     
     await bot.process_commands(message)
+
+# ======= UTILÁRIOS =======
 
 def remover_acentos(texto):
     return ''.join(
@@ -349,6 +376,8 @@ async def load_cogs():
 
 async def main():
     print("Iniciando bot...")
+
+# ======= INICIALIZAÇÃO =======
 
 if __name__ == "__main__":
     TOKEN = os.environ["TOKEN"]
